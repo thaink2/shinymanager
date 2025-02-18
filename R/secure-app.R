@@ -33,6 +33,7 @@ secure_app <- function(ui,
                        theme = NULL,
                        language = "en",
                        fab_position = "bottom-right") {
+
   if (!language %in% c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")) {
     warning("Only supported language for the now are: en, fr, pt-BR, es, de, pl, ja, el, id, zh-CN", call. = FALSE)
     language <- "en"
@@ -42,21 +43,28 @@ secure_app <- function(ui,
   ui <- force(ui)
   enable_admin <- force(enable_admin)
   head_auth <- force(head_auth)
+
   if (is.null(theme)) {
     theme <- "shinymanager/css/readable.min.css"
   }
 
   function(request) {
+
     query <- parseQueryString(request$QUERY_STRING)
+
     token <- gsub('\"', "", query$token)
+
     admin <- query$admin
+
     language <- query$language
     if (!is.null(language)) {
       lan <- use_language(gsub('\"', "", language))
     }
+
     if (.tok$is_valid(token)) {
       is_forced_chg_pwd <- is_force_chg_pwd(token = token)
-      if (is_forced_chg_pwd) {
+
+      if (is_forced_chg_pwd || is.na(is_forced_chg_pwd)) {
         args <- get_args(..., fun = pwd_ui)
         args$id <- "password"
         args$lan <- lan
@@ -69,8 +77,10 @@ secure_app <- function(ui,
         )
         return(pwd_ui)
       }
-      if (isTRUE(enable_admin) && .tok$is_admin(token) & identical(admin, "true") && (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
-        navbarPage(
+
+      if (isTRUE(enable_admin) && .tok$is_admin(token) & identical(admin, "true") &&
+          (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
+        app_ui <- navbarPage(
           title = "Admin",
           id = "sm_admin_nv",
           theme = theme,
@@ -105,8 +115,10 @@ secure_app <- function(ui,
             )
           }
         )
+        return(app_ui)
       } else {
-        if (isTRUE(enable_admin) && .tok$is_admin(token) && (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
+        if (isTRUE(enable_admin) && .tok$is_admin(token) &&
+            (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
           menu <- fab_button(
             position = fab_position,
             actionButton(
@@ -121,7 +133,8 @@ secure_app <- function(ui,
             )
           )
         } else {
-          if (isTRUE(enable_admin) && .tok$is_admin(token) && is.null(.tok$get_sqlite_path()) && is.null(.tok$get_sql_config_db())) {
+          if (isTRUE(enable_admin) && .tok$is_admin(token) &&
+              is.null(.tok$get_sqlite_path()) && is.null(.tok$get_sql_config_db())) {
             warning("Admin mode is only available when using a SQLite / SQL database!", call. = FALSE)
           }
           menu <- fab_button(
@@ -135,17 +148,20 @@ secure_app <- function(ui,
         }
         save_logs(token)
         if (is.function(ui)) {
-          ui <- ui(request)
+          res_ui <- ui(request)
+          ui <- res_ui
         }
-        tagList(
-          ui, menu, shinymanager_where("application"),
+        app <- tagList(
+          ui,
+          menu,
+          shinymanager_where("application"),
           shinymanager_language(lan$get_language()),
           singleton(tags$head(tags$script(src = "shinymanager/timeout.js")))
         )
+        return(app)
       }
     } else {
       args <- get_args(..., fun = auth_ui)
-      # patch / message changing tag_img & tag_div
       deprecated <- list(...)
       if ("tag_img" %in% names(deprecated)) {
         args$tags_top <- deprecated$tag_img
@@ -157,16 +173,18 @@ secure_app <- function(ui,
       }
       args$id <- "auth"
       args$lan <- lan
-      fluidPage(
+      auth_page <- fluidPage(
         theme = theme,
         tags$head(head_auth),
         do.call(auth_ui, args),
         shinymanager_where("authentication"),
         shinymanager_language(lan$get_language())
       )
+      return(auth_page)
     }
   }
 }
+
 
 
 #' @param check_credentials Function passed to \code{\link{auth_server}}.
@@ -214,18 +232,18 @@ secure_app <- function(ui,
 #' Using \code{options("shinymanager.pwd_failure_limit")}, you can set password failure limit. It defaults
 #' to \code{Inf}. You can specify for example
 #' \code{options("shinymanager.pwd_failure_limit" = 5)} if you want to lock user account after 5 wrong password.
-#' 
-#' Using \code{options("shinymanager.auto_sqlite_reader")}, you can set reactiveFileReader time (milliseconds) used to look at sqlite db only. 
+#'
+#' Using \code{options("shinymanager.auto_sqlite_reader")}, you can set reactiveFileReader time (milliseconds) used to look at sqlite db only.
 #' Used and useful in admin panel to prevent bug having potentially multiple admin session. It defaults to \code{1000}
-#'  
+#'
 #' Using \code{options("shinymanager.auto_sql_reader")}, you can set reactiveTimer SQL (not sqlite) admin reader. It defaults
 #' to \code{Inf} (disabled). It's only needed to prevent potential bug if two ore more admin are updated users
 #' at the same time.
-#'   
+#'
 #' Using \code{options("shinymanager.write_logs")}, you can activate or not writing users connection logs. Default to \code{TRUE}
-#' 
+#'
 #' Using \code{options("shinymanager.show_logs")}, you can activate or not showing users connection logs in admin panel. Default to \code{TRUE}
-#' 
+#'
 #' @export
 #'
 #' @importFrom shiny callModule getQueryString parseQueryString
@@ -286,7 +304,7 @@ secure_server <- function(check_credentials,
 
   path_sqlite <- .tok$get_sqlite_path()
   config_db <- .tok$get_sql_config_db()
-  
+
   if (!is.null(path_sqlite) | !is.null(config_db)) {
     callModule(
       module = admin,
@@ -298,7 +316,7 @@ secure_server <- function(check_credentials,
       max_users = max_users,
       lan = lan
     )
-    
+
     if(show_logs_enabled()){
       callModule(
         module = logs,

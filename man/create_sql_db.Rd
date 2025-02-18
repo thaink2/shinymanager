@@ -20,9 +20,9 @@ The credentials \code{data.frame} can have the following columns:
   \item \strong{user (mandatory)} : the user's name.
   \item \strong{password (mandatory)} : the user's password.
   \item \strong{admin (optional)} : logical, is user have admin right ? If so,
-   user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing. 
-  \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing. 
-  \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing. 
+   user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing.
+  \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
+  \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
   \item \strong{applications (optional)} : the name of the applications to which the user is authorized,
    separated by a semicolon. The name of the application corresponds to the name of the directory,
    or can be declared using : \code{options("shinymanager.application" = "my-app")}
@@ -64,24 +64,24 @@ ui <- secure_app(ui, choose_language = TRUE)
 
 
 server <- function(input, output, session) {
- 
+
  # call the server part
  # check_credentials returns a function to authenticate users
  res_auth <- secure_server(
    check_credentials = check_credentials(db = "path/to/your_sql_configuration.yml")
  )
- 
+
  output$auth_output <- renderPrint({
    reactiveValuesToList(res_auth)
  })
- 
+
  observe({
    print(input$shinymanager_where)
    print(input$shinymanager_language)
  })
- 
+
  # your classic server logic
- 
+
 }
 
 shinyApp(ui, server)
