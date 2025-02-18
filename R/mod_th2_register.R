@@ -134,7 +134,7 @@ signup_server <- function(id, parent_session, lan = NULL) {
               expire_time = as.Date(Sys.Date() + 365),
               is_admin = FALSE
             )
-          config_path <- "./inst/sql_config/pg_template.yml"
+          config_path <- system.file("sql_config/pg_template.yml", package = "th2coldorg")
           config_db <- tryCatch(
             {
               yaml::yaml.load_file(config_path, eval.expr = TRUE)
