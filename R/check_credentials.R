@@ -1,9 +1,8 @@
-
 #' Check credentials
 #'
-#' @param db A \code{data.frame} with credentials data, a  path to SQLite database created with \code{\link{create_db}} 
+#' @param db A \code{data.frame} with credentials data, a  path to SQLite database created with \code{\link{create_db}}
 #' or a .yaml configuration path of SQL Database created with \code{\link{create_sql_db}}.
-#' 
+#'
 #' @param passphrase Passphrase to decrypt the SQLite database.
 #'
 #' @return Return a \code{function} with two arguments: \code{user} and \code{password}
@@ -22,9 +21,9 @@
 #'   \item \strong{user (mandatory)} : the user's name.
 #'   \item \strong{password (mandatory)} : the user's password.
 #'   \item \strong{admin (optional)} : logical, is user have admin right ? If so,
-#'    user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing. 
-#'   \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing. 
-#'   \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing. 
+#'    user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing.
+#'   \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
+#'   \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
 #'   \item \strong{applications (optional)} : the name of the applications to which the user is authorized,
 #'    separated by a semicolon. The name of the application corresponds to the name of the directory,
 #'    or can be declared using : \code{options("shinymanager.application" = "my-app")}
@@ -61,7 +60,7 @@
 #' check_credentials(credentials)("fanny", "azerty")
 #' check_credentials(credentials)("fanny", "azert")
 #' check_credentials(credentials)("fannyyy", "azerty")
-#' 
+#'
 #' \dontrun{
 #'
 #' ## With a SQLite database:
@@ -70,13 +69,12 @@
 #'
 #' ## With a SQL database:
 #' check_credentials("config_db.yml")
-#' 
 #' }
-#' 
+#'
 #' @importFrom scrypt verifyPassword
 #'
 #' @seealso \code{\link{create_db}}, \code{\link{create_sql_db}}, \code{\link{check_credentials}}
-#' 
+#'
 check_credentials <- function(db, passphrase = NULL) {
   if (is.data.frame(db)) {
     .tok$set_sqlite_path(NULL)
@@ -89,11 +87,14 @@ check_credentials <- function(db, passphrase = NULL) {
     .tok$set_passphrase(passphrase)
     check_credentials_sqlite(sqlite_path = db, passphrase = passphrase)
   } else if (is_yaml(db)) {
-    config_db <- tryCatch({
-      yaml::yaml.load_file(db, eval.expr = TRUE)
-    }, error = function(e) stop("Error reading 'config_path' SQL DB configuration :", e$message))
+    config_db <- tryCatch(
+      {
+        yaml::yaml.load_file(db, eval.expr = TRUE)
+      },
+      error = function(e) stop("Error reading 'config_path' SQL DB configuration :", e$message)
+    )
     verify_sql_config(config_db)
-    
+
     .tok$set_sqlite_path(NULL)
     .tok$set_sql_config_db(config_db)
     check_credentials_sql(config_db = config_db)
@@ -115,26 +116,26 @@ check_credentials_df <- function(user, password, credentials_df) {
   }
   user_info <- credentials_df[credentials_df$user == user, setdiff(names(credentials_df), c("password", "is_hashed_password")), drop = FALSE]
   pwd <- credentials_df$password[credentials_df$user == user]
-  if("is_hashed_password" %in% colnames(credentials_df)){
+  if ("is_hashed_password" %in% colnames(credentials_df)) {
     is_hashed_pwd <- credentials_df$is_hashed_password[credentials_df$user == user]
   } else {
     is_hashed_pwd <- FALSE
   }
-  
-  if(is_hashed_pwd){
+
+  if (is_hashed_pwd) {
     good_password <- isTRUE(scrypt::verifyPassword(pwd, password))
   } else {
     good_password <- isTRUE(pwd == password)
   }
 
-  if (hasName(credentials_df, "expire") | hasName(credentials_df, "start")) {
-    if (is.null(user_info$start) | (!is.null(user_info$start) && is.na(user_info$start))) {
-      user_info$start <- Sys.Date() - 1
+  if (hasName(credentials_df, "expire_time") | hasName(credentials_df, "start_time")) {
+    if (is.null(user_info$start_time) | (!is.null(user_info$start_time) && is.na(user_info$start_time))) {
+      user_info$start_time <- Sys.Date() - 1
     }
-    if (is.null(user_info$expire) | (!is.null(user_info$expire) && is.na(user_info$expire))) {
-      user_info$expire <- Sys.Date() + 1
+    if (is.null(user_info$expire_time) | (!is.null(user_info$expire_time) && is.na(user_info$expire_time))) {
+      user_info$expire_time <- Sys.Date() + 1
     }
-    good_time <- isTRUE(user_info$start <= Sys.Date() & user_info$expire >= Sys.Date())
+    good_time <- isTRUE(user_info$start_time <= Sys.Date() & user_info$expire_time >= Sys.Date())
   } else {
     good_time <- TRUE
   }
@@ -190,14 +191,14 @@ check_credentials_sqlite <- function(sqlite_path, passphrase) {
 }
 
 
-check_credentials_sql <- function(config_db){
+check_credentials_sql <- function(config_db) {
   function(user, password) {
     conn <- connect_sql_db(config_db)
     on.exit(disconnect_sql_db(conn, config_db))
     tablename <- SQL(config_db$tables$credentials$tablename)
     request <- glue_sql(config_db$tables$credentials$select, .con = conn)
     db <- dbGetQuery(conn, request)
-    if(nrow(db) > 0) db$is_hashed_password <- T
+    if (nrow(db) > 0) db$is_hashed_password <- T
     check_credentials_df(user, password, credentials_df = db)
   }
 }

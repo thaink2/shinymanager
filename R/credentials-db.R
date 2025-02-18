@@ -5,10 +5,10 @@
 #' @param credentials_data A \code{data.frame} with information about users, \code{user} and \code{password} are required.
 #' @param sqlite_path Path to the SQLite database.
 #' @param passphrase A password to protect the data inside the database.
-#' @param flags \code{RSQLite::SQLITE_RWC:} open the database in read/write mode and create the database file if it does not already exist; 
-#' \code{RSQLite::SQLITE_RW:} open the database in read/write mode. Raise an error if the file does not already exist; 
+#' @param flags \code{RSQLite::SQLITE_RWC:} open the database in read/write mode and create the database file if it does not already exist;
+#' \code{RSQLite::SQLITE_RW:} open the database in read/write mode. Raise an error if the file does not already exist;
 #' \code{RSQLite::SQLITE_RO:} open the database in read only mode. Raise an error if the file does not already exist
-#' 
+#'
 #' @export
 #'
 #' @details The credentials \code{data.frame} can have the following columns:
@@ -16,9 +16,9 @@
 #'   \item \strong{user (mandatory)} : the user's name.
 #'   \item \strong{password (mandatory)} : the user's password.
 #'   \item \strong{admin (optional)} : logical, is user have admin right ? If so,
-#'    user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing. 
-#'   \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing. 
-#'   \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing. 
+#'    user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing.
+#'   \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
+#'   \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
 #'   \item \strong{applications (optional)} : the name of the applications to which the user is authorized,
 #'    separated by a semicolon. The name of the application corresponds to the name of the directory,
 #'    or can be declared using : \code{options("shinymanager.application" = "my-app")}
@@ -35,7 +35,7 @@
 #'
 #' library(shiny)
 #' library(shinymanager)
-#' 
+#'
 #' #### init the Sqlite Database
 #' # Credentials data
 #' credentials <- data.frame(
@@ -52,8 +52,8 @@
 #' create_db(
 #'   credentials_data = credentials,
 #'   sqlite_path = "/path/to/database.sqlite", # will be created
-#'    passphrase = key_get("R-shinymanager-key", "obiwankenobi")
-#'    # passphrase = "secret"  # or just a word, without keyring
+#'   passphrase = key_get("R-shinymanager-key", "obiwankenobi")
+#'   # passphrase = "secret"  # or just a word, without keyring
 #' )
 #'
 #' ### Use in shiny
@@ -61,61 +61,60 @@
 #'   tags$h2("My secure application"),
 #'   verbatimTextOutput("auth_output")
 #' )
-#' 
+#'
 #' # Wrap your UI with secure_app
 #' ui <- secure_app(ui, choose_language = TRUE)
-#' 
 #'
-#'server <- function(input, output, session) {
-#'  
-#'  # call the server part
-#'  # check_credentials returns a function to authenticate users
-#'  res_auth <- secure_server(
-#'    check_credentials = check_credentials(
-#'        db = "/path/to/database.sqlite", 
-#'        passphrase = key_get("R-shinymanager-key", "obiwankenobi")
-#'    )
-#'  )
-#'  
-#'  output$auth_output <- renderPrint({
-#'    reactiveValuesToList(res_auth)
-#'  })
-#'  
-#'  observe({
-#'    print(input$shinymanager_where)
-#'    print(input$shinymanager_language)
-#'  })
-#'  
-#'  # your classic server logic
-#'  
+#'
+#' server <- function(input, output, session) {
+#'   # call the server part
+#'   # check_credentials returns a function to authenticate users
+#'   res_auth <- secure_server(
+#'     check_credentials = check_credentials(
+#'       db = "/path/to/database.sqlite",
+#'       passphrase = key_get("R-shinymanager-key", "obiwankenobi")
+#'     )
+#'   )
+#'
+#'   output$auth_output <- renderPrint({
+#'     reactiveValuesToList(res_auth)
+#'   })
+#'
+#'   observe({
+#'     print(input$shinymanager_where)
+#'     print(input$shinymanager_language)
+#'   })
+#'
+#'   # your classic server logic
 #' }
 #'
 #' shinyApp(ui, server)
+#' }
 #'
-#'}
-#' 
 #' @seealso \code{\link{create_db}}, \code{\link{create_sql_db}}, \code{\link{check_credentials}}, \code{\link{read_db_decrypt}}
-#' 
+#'
 create_db <- function(credentials_data, sqlite_path, passphrase = NULL, flags = RSQLite::SQLITE_RWC) {
   if (!all(c("user", "password") %in% names(credentials_data))) {
     stop("credentials_data must contains columns: 'user', 'password'", call. = FALSE)
   }
-  if(any(duplicated(credentials_data$user))){
+  if (any(duplicated(credentials_data$user))) {
     stop("Duplicated users in credentials_data", call. = FALSE)
   }
-  if(!"admin" %in% names(credentials_data)){
+  if (!"admin" %in% names(credentials_data)) {
     credentials_data$admin <- FALSE
   }
-  if(!"start" %in% names(credentials_data)){
+  if (!"start" %in% names(credentials_data)) {
     credentials_data$start <- NA
   }
-  if(!"expire" %in% names(credentials_data)){
+  if (!"expire" %in% names(credentials_data)) {
     credentials_data$expire <- NA
   }
 
   default_col <- c("user", "password", "start", "expire", "admin")
-  credentials_data <- credentials_data[, c(default_col,
-                                           setdiff(colnames(credentials_data), default_col))]
+  credentials_data <- credentials_data[, c(
+    default_col,
+    setdiff(colnames(credentials_data), default_col)
+  )]
   conn <- dbConnect(SQLite(), dbname = sqlite_path, flags = flags)
   on.exit(dbDisconnect(conn))
   credentials_data[] <- lapply(credentials_data, as.character)
@@ -183,7 +182,7 @@ create_db <- function(credentials_data, sqlite_path, passphrase = NULL, flags = 
 #' # read
 #' read_db_decrypt(conn = conn, name = "iris", passphrase = "supersecret")
 #'
-#' 
+#'
 #' # with wrong passphrase
 #' \dontrun{
 #' read_db_decrypt(conn = conn, name = "iris", passphrase = "forgotten")
@@ -203,8 +202,10 @@ create_db <- function(credentials_data, sqlite_path, passphrase = NULL, flags = 
 #'   passphrase = key_get("R-shinymanager-key", "obiwankenobi")
 #' )
 #'
-#' add_user <- data.frame(user = "new", password = "pwdToChange",
-#'                       start = NA, expire = NA, admin = TRUE)
+#' add_user <- data.frame(
+#'   user = "new", password = "pwdToChange",
+#'   start = NA, expire = NA, admin = TRUE
+#' )
 #'
 #' new_users <- rbind.data.frame(current_user, add_user)
 #'
@@ -234,7 +235,7 @@ create_db <- function(credentials_data, sqlite_path, passphrase = NULL, flags = 
 #'   passphrase = key_get("R-shinymanager-key", "obiwankenobi")
 #' )
 #' }
-#' 
+#'
 #' DBI::dbDisconnect(conn)
 #'
 write_db_encrypt <- function(conn, value, name = "credentials", passphrase = NULL) {
@@ -243,12 +244,12 @@ write_db_encrypt <- function(conn, value, name = "credentials", passphrase = NUL
     on.exit(dbDisconnect(conn))
   }
 
-  if(name == "credentials" && "password" %in% colnames(value)){
-    if(!"is_hashed_password" %in% colnames(value)){
+  if (name == "credentials" && "password" %in% colnames(value)) {
+    if (!"is_hashed_password" %in% colnames(value)) {
       value$is_hashed_password <- FALSE
     }
     to_hash <- which(!as.logical(value$is_hashed_password))
-    if(length(to_hash) > 0){
+    if (length(to_hash) > 0) {
       # store hashed password
       value$password[to_hash] <- sapply(value$password[to_hash], function(x) scrypt::hashPassword(x))
       value$is_hashed_password[to_hash] <- TRUE
@@ -292,9 +293,3 @@ read_db_decrypt <- function(conn, name = "credentials", passphrase = NULL) {
   }
   return(out)
 }
-
-
-
-
-
-

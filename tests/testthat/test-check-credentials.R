@@ -1,7 +1,6 @@
 context("test-check-credentials")
 
 test_that("check_credentials works", {
-
   credentials <- data.frame(
     user = c("fanny", "victor"),
     password = c("azerty", "12345"),
@@ -16,7 +15,6 @@ test_that("check_credentials works", {
 
 
 test_that("check_credentials (expired) works", {
-
   credentials <- data.frame(
     user = c("fanny", "victor", "benoit"),
     password = c("azerty", "12345", "azerty"),
@@ -33,7 +31,6 @@ test_that("check_credentials (expired) works", {
 
 
 test_that("check_credentials (applications) works", {
-
   credentials <- data.frame(
     user = c("fanny", "victor", "benoit"),
     password = c("azerty", "12345", "azerty"),
@@ -49,4 +46,3 @@ test_that("check_credentials (applications) works", {
   expect_false(check_credentials(credentials)("victor", "12345")$result)
   expect_false(check_credentials(credentials)("victor", "12345")$authorized)
 })
-

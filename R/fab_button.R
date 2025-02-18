@@ -1,4 +1,3 @@
-
 #' @title Create a FAB button
 #'
 #' @description Create a fixed button in page corner with additional button(s) in it
@@ -34,9 +33,10 @@ fab_button <- function(...,
   toggle <- match.arg(toggle)
   animation <- match.arg(animation)
   position <- match.arg(position)
-  if (position == "none") return(NULL)
-  position <- switch(
-    position,
+  if (position == "none") {
+    return(NULL)
+  }
+  position <- switch(position,
     "bottom-right" = "br",
     "top-right" = "tr",
     "bottom-left" = "bl",
@@ -110,4 +110,3 @@ html_dependency_fab <- function() {
     all_files = FALSE
   )
 }
-

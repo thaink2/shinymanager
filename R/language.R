@@ -1,6 +1,6 @@
 pkgEnv <- new.env()
 
-pkgEnv$label_cn = list(
+pkgEnv$label_cn <- list(
   "Please authenticate" = "\u8bf7\u9a8c\u8bc1",
   "Username:" = "\u7528\u6237\u540d\uff1a",
   "Password:" = "\u5bc6\u7801\uff1a",
@@ -65,7 +65,7 @@ pkgEnv$label_cn = list(
   "Temporary password:" = "\u4e34\u65f6\u5bc6\u7801\uff1a",
   "Password succesfully reset!" = "\u5bc6\u7801\u91cd\u7f6e\u6210\u529f\uff01",
   "You are not authorized for this application" = "\u60a8\u672a\u88ab\u6388\u6743\u4f7f\u7528\u6b64\u5e94\u7528\u7a0b\u5e8f",
-  "Language"  = "\u8bed\u8a00",
+  "Language" = "\u8bed\u8a00",
   "Yes" = "\u662f",
   "No" = "\u5426",
   "Password" = "\u5bc6\u7801",
@@ -86,7 +86,7 @@ pkgEnv$label_cn = list(
   "Allowed null values" = "\u5141\u8bb8\u7a7a\u503c"
 )
 
-pkgEnv$label_en = list(
+pkgEnv$label_en <- list(
   "Please authenticate" = "Please authenticate",
   "Username:" = "Username :",
   "Password:" = "Password :",
@@ -151,7 +151,7 @@ pkgEnv$label_en = list(
   "Temporary password:" = "Temporary password:",
   "Password succesfully reset!" = "Password succesfully reset!",
   "You are not authorized for this application" = "You are not authorized for this application",
-  "Language"  = "Language",
+  "Language" = "Language",
   "Yes" = "Yes",
   "No" = "No",
   "Password" = "Password",
@@ -172,7 +172,7 @@ pkgEnv$label_en = list(
   "Allowed null values" = "Allowed null values"
 )
 
-pkgEnv$label_fr = list(
+pkgEnv$label_fr <- list(
   "Please authenticate" = "Veuillez vous authentifier",
   "Username:" = "Nom d\'utilisateur :",
   "Password:" = "Mot de passe :",
@@ -237,7 +237,7 @@ pkgEnv$label_fr = list(
   "Temporary password:" = "Mot de passe temporaire",
   "Password succesfully reset!" = "Mot de passe r\u00e9initialis\u00e9",
   "You are not authorized for this application" = "Vous n\'\u00eates pas habilit\u00e9 pour cette application",
-  "Language"  = "Langue",
+  "Language" = "Langue",
   "Yes" = "Oui",
   "No" = "Non",
   "Password" = "Mot de passe",
@@ -258,7 +258,7 @@ pkgEnv$label_fr = list(
   "Allowed null values" = "Valeurs nulles autoris\u00e9es"
 )
 
-pkgEnv$label_ptbr = list(
+pkgEnv$label_ptbr <- list(
   "Please authenticate" = "Autentica\u00e7\u00e3o",
   "Username:" = "Usu\u00e1rio :",
   "Password:" = "Senha :",
@@ -323,7 +323,7 @@ pkgEnv$label_ptbr = list(
   "Temporary password:" = "Senha tempor\u00e1ria",
   "Password succesfully reset!" = "Senha resetada com sucesso!",
   "You are not authorized for this application" = "Voc\u00ea n\u00e3o est\u00e1 autorizado a utilizar esse aplicativo",
-  "Language"  = "L\u00edngua",
+  "Language" = "L\u00edngua",
   "Yes" = "Sim",
   "No" = "N\u00e3o",
   "Password" = "Senha",
@@ -344,7 +344,7 @@ pkgEnv$label_ptbr = list(
   "Allowed null values" = "Valores nulos autorizados"
 )
 
-pkgEnv$label_es = list(
+pkgEnv$label_es <- list(
   "Please authenticate" = "Favor de autenticarse",
   "Username:" = "Usuario:",
   "Password:" = "Contrase\u00f1a:",
@@ -430,7 +430,7 @@ pkgEnv$label_es = list(
   "Allowed null values" = "Valores nulos permitidos"
 )
 
-pkgEnv$label_de = list(
+pkgEnv$label_de <- list(
   "Please authenticate" = "Bitte anmelden",
   "Username:" = "Benutzername :",
   "Password:" = "Passwort :",
@@ -495,7 +495,7 @@ pkgEnv$label_de = list(
   "Temporary password:" = "Tempor\u00e4res Passwort:",
   "Password succesfully reset!" = "Passwort erfolgreich zur\u00fcckgesetzt!",
   "You are not authorized for this application" = "F\u00fcr diese Anwendung nicht autorisiert",
-  "Language"  = "Sprache",
+  "Language" = "Sprache",
   "Yes" = "Ja",
   "No" = "Nein",
   "Password" = "Passwort",
@@ -516,7 +516,7 @@ pkgEnv$label_de = list(
   "Allowed null values" = "Nullwerte erlaubt"
 )
 
-pkgEnv$label_pl = list(
+pkgEnv$label_pl <- list(
   "Please authenticate" = "Prosz\u0119 o uwierzytelnienie",
   "Username:" = "Nazwa u\u017cytkownika :",
   "Password:" = "Has\u0142o :",
@@ -581,7 +581,7 @@ pkgEnv$label_pl = list(
   "Temporary password:" = "Has\u0142o tymczasowe",
   "Password succesfully reset!" = "Reset has\u0142a zako\u0144czony powodzeniem!",
   "You are not authorized for this application" = "Nie masz autoryzacji dla tej aplikacji",
-  "Language"  = "J\u0119zyk",
+  "Language" = "J\u0119zyk",
   "Yes" = "Tak",
   "No" = "Nie",
   "Password" = "Has\u0142o",
@@ -602,7 +602,7 @@ pkgEnv$label_pl = list(
   "Allowed null values" = "Dozwolone warto\u015bci zerowe"
 )
 
-pkgEnv$label_ja = list(
+pkgEnv$label_ja <- list(
   "Please authenticate" = "\u8a8d\u8a3c\u3057\u3066\u304f\u3060\u3055\u3044",
   "Username:" = "\u30e6\u30fc\u30b6\u30fc\u540d :",
   "Password:" = "\u30d1\u30b9\u30ef\u30fc\u30c9 :",
@@ -667,7 +667,7 @@ pkgEnv$label_ja = list(
   "Temporary password:" = "\u4e00\u6642\u7684\u306a\u30d1\u30b9\u30ef\u30fc\u30c9:",
   "Password succesfully reset!" = "\u30d1\u30b9\u30ef\u30fc\u30c9\u306e\u30ea\u30bb\u30c3\u30c8\u306b\u6210\u529f\u3057\u307e\u3057\u305f",
   "You are not authorized for this application" = "\u3053\u306e\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3\u306e\u5229\u7528\u3092\u3042\u306a\u305f\u306f\u8a31\u53ef\u3055\u308c\u3066\u3044\u307e\u305b\u3093",
-  "Language"  = "\u8a00\u8a9e",
+  "Language" = "\u8a00\u8a9e",
   "Yes" = "\u306f\u3044",
   "No" = "\u3044\u3044\u3048",
   "Password" = "\u30d1\u30b9\u30ef\u30fc\u30c9",
@@ -688,7 +688,7 @@ pkgEnv$label_ja = list(
   "Allowed null values" = "\u30cc\u30eb\u5024\u306f\u8a31\u5bb9\u3055\u308c\u3066\u3044\u307e\u3059"
 )
 
-pkgEnv$label_el = list(
+pkgEnv$label_el <- list(
   "Please authenticate" = "\u03a0\u03b1\u03c1\u03b1\u03ba\u03b1\u03bb\u03ce \u03b5\u03c0\u03b1\u03bb\u03b7\u03b8\u03b5\u03cd\u03c3\u03c4\u03b5",
   "Username:" = "\u038c\u03bd\u03bf\u03bc\u03b1 \u03c7\u03c1\u03ae\u03c3\u03c4\u03b7 :",
   "Password:" = "\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2 :",
@@ -753,7 +753,7 @@ pkgEnv$label_el = list(
   "Temporary password:" = "\u03a0\u03c1\u03bf\u03c3\u03c9\u03c1\u03b9\u03bd\u03cc\u03c2 \u03ba\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2:",
   "Password succesfully reset!" = "\u039f \u03ba\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2 \u03b5\u03c0\u03b1\u03bd\u03b1\u03c6\u03ad\u03c1\u03b8\u03b7\u03ba\u03b5 \u03bc\u03b5 \u03b5\u03c0\u03b9\u03c4\u03c5\u03c7\u03af\u03b1!",
   "You are not authorized for this application" = "\u0394\u03b5\u03bd \u03b5\u03af\u03c3\u03c4\u03b5 \u03b5\u03be\u03bf\u03c5\u03c3\u03b9\u03bf\u03b4\u03bf\u03c4\u03b7\u03bc\u03ad\u03bd\u03bf\u03b9 \u03b3\u03b9\u03b1 \u03b1\u03c5\u03c4\u03ae\u03bd \u03c4\u03b7\u03bd \u03b5\u03c6\u03b1\u03c1\u03bc\u03bf\u03b3\u03ae",
-  "Language"  = "\u0393\u03bb\u03ce\u03c3\u03c3\u03b1",
+  "Language" = "\u0393\u03bb\u03ce\u03c3\u03c3\u03b1",
   "Yes" = "\u039d\u03b1\u03b9",
   "No" = "\u038c\u03c7\u03b9",
   "Password" = "\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2",
@@ -775,7 +775,7 @@ pkgEnv$label_el = list(
 )
 
 
-pkgEnv$label_id = list(
+pkgEnv$label_id <- list(
   "Please authenticate" = "Masuk",
   "Username:" = "Nama akun :",
   "Password:" = "Kata sandi :",
@@ -840,7 +840,7 @@ pkgEnv$label_id = list(
   "Temporary password:" = "Kata sandi sementara:",
   "Password succesfully reset!" = "Kata sandi berhasil diperbarui!",
   "You are not authorized for this application" = "Anda tidak memiliki akses untuk aplikasi ini",
-  "Language"  = "Bahasa",
+  "Language" = "Bahasa",
   "Yes" = "Ya",
   "No" = "Tidak",
   "Password" = "Kata sandi",
@@ -861,8 +861,8 @@ pkgEnv$label_id = list(
   "Allowed null values" = "Nilai kosong diperbolehkan"
 )
 
-v_language_registered = c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")
-names(v_language_registered) = c("English", "Fran\u00e7ais", "Portuguese", "Espa\u00f1ol", "Deutsch", "Polski", "\u65e5\u672c\u8a9e", "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac", "Indonesian", "\u4e2d\u6587")
+v_language_registered <- c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")
+names(v_language_registered) <- c("English", "Fran\u00e7ais", "Portuguese", "Espa\u00f1ol", "Deutsch", "Polski", "\u65e5\u672c\u8a9e", "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac", "Indonesian", "\u4e2d\u6587")
 
 
 #' @importFrom R6 R6Class
@@ -878,17 +878,17 @@ language <- R6::R6Class(
         stop("Unsupported language !", call. = FALSE)
       }
       private$language <- lan
-      private$labels <-   switch(lan,
-                                  "en" = pkgEnv$label_en,
-                                  "fr" = pkgEnv$label_fr,
-                                  "pt-BR" = pkgEnv$label_ptbr,
-                                  "es" = pkgEnv$label_es,
-                                  "de" = pkgEnv$label_de,
-                                  "pl" = pkgEnv$label_pl,
-                                  "ja" = pkgEnv$label_ja,
-                                  "el" = pkgEnv$label_el,
-                                  "id" = pkgEnv$label_id,
-                                  "zh-CN" = pkgEnv$label_cn
+      private$labels <- switch(lan,
+        "en" = pkgEnv$label_en,
+        "fr" = pkgEnv$label_fr,
+        "pt-BR" = pkgEnv$label_ptbr,
+        "es" = pkgEnv$label_es,
+        "de" = pkgEnv$label_de,
+        "pl" = pkgEnv$label_pl,
+        "ja" = pkgEnv$label_ja,
+        "el" = pkgEnv$label_el,
+        "id" = pkgEnv$label_id,
+        "zh-CN" = pkgEnv$label_cn
       )
     },
     get = function(label) {
@@ -927,8 +927,8 @@ language <- R6::R6Class(
       "de" = "de",
       "pl" = "pl",
       "ja" = "ja",
-      "el" = "el", 
-      "id" = "id", 
+      "el" = "el",
+      "id" = "id",
       "zh-CN" = "zh-CN"
     ),
     DT_lan = list(
@@ -1207,7 +1207,6 @@ use_language <- function(lan = "en") {
 #'   "Password:" = "Enter your password:"
 #' )
 set_labels <- function(language, ...) {
-  
   if (!language %in% c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")) {
     stop("Only supported language for the now are: en, fr, pt-BR, es, de, pl, ja, el, id, zh-CN", call. = FALSE)
   }
@@ -1217,16 +1216,16 @@ set_labels <- function(language, ...) {
   }
 
   current_labels <- switch(language,
-                   "en" = pkgEnv$label_en,
-                   "fr" = pkgEnv$label_fr,
-                   "pt-BR" = pkgEnv$label_ptbr,
-                   "es" = pkgEnv$label_es,
-                   "de" = pkgEnv$label_de,
-                   "pl" = pkgEnv$label_pl,
-                   "ja" = pkgEnv$label_ja,
-                   "el" = pkgEnv$label_el,
-                   "id" = pkgEnv$label_id,
-                   "zh-CN" = pkgEnv$label_cn
+    "en" = pkgEnv$label_en,
+    "fr" = pkgEnv$label_fr,
+    "pt-BR" = pkgEnv$label_ptbr,
+    "es" = pkgEnv$label_es,
+    "de" = pkgEnv$label_de,
+    "pl" = pkgEnv$label_pl,
+    "ja" = pkgEnv$label_ja,
+    "el" = pkgEnv$label_el,
+    "id" = pkgEnv$label_id,
+    "zh-CN" = pkgEnv$label_cn
   )
 
   update_labels <- modifyList(
@@ -1248,7 +1247,7 @@ set_labels <- function(language, ...) {
     pkgEnv$label_pl <- update_labels
   } else if (language %in% "ja") {
     pkgEnv$label_ja <- update_labels
-  } else if(language %in% "zh-CN"){
+  } else if (language %in% "zh-CN") {
     pkgEnv$label_cn <- update_labels
   } else if (language %in% "el") {
     pkgEnv$label_el <- update_labels
@@ -1263,22 +1262,21 @@ set_labels <- function(language, ...) {
 #'
 #' @rdname custom-labels
 get_labels <- function(language = "en") {
-
   if (!language %in% c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")) {
     warning("Only supported language for the now are: en, fr, pt-BR, es, de, pl, ja, el, id, zh-CN", call. = FALSE)
     language <- "en"
   }
 
   switch(language,
-          "en" = pkgEnv$label_en,
-          "fr" = pkgEnv$label_fr,
-          "pt-BR" = pkgEnv$label_ptbr,
-          "es" = pkgEnv$label_es,
-          "de" = pkgEnv$label_de,
-          "pl" = pkgEnv$label_pl,
-          "ja" = pkgEnv$label_ja,
-          "zh-CN" = pkgEnv$label_cn,
-          "el" = pkgEnv$label_el,
-          "id" = pkgEnv$label_id
+    "en" = pkgEnv$label_en,
+    "fr" = pkgEnv$label_fr,
+    "pt-BR" = pkgEnv$label_ptbr,
+    "es" = pkgEnv$label_es,
+    "de" = pkgEnv$label_de,
+    "pl" = pkgEnv$label_pl,
+    "ja" = pkgEnv$label_ja,
+    "zh-CN" = pkgEnv$label_cn,
+    "el" = pkgEnv$label_el,
+    "id" = pkgEnv$label_id
   )
 }

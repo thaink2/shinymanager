@@ -8,4 +8,4 @@
   shiny::addResourcePath("shinymanager", system.file("assets", package = "shinymanager"))
 }
 
-shinymanager_con <- new.env(hash=TRUE)
+shinymanager_con <- new.env(hash = TRUE)

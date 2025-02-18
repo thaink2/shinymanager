@@ -1,4 +1,3 @@
-
 #' Enable / Disable a Button
 #'
 #' @param session shiny session.
@@ -23,16 +22,20 @@ shinymanager_where <- function(where) {
   # humm, little hack ^^
   tags$div(
     style = "display: none;",
-    selectInput(inputId = "shinymanager_where", label = NULL, 
-               choices = where, selected = where, multiple = FALSE)
+    selectInput(
+      inputId = "shinymanager_where", label = NULL,
+      choices = where, selected = where, multiple = FALSE
+    )
   )
 }
 
 shinymanager_language <- function(lan) {
   tags$div(
     style = "display: none;",
-    selectInput(inputId = "shinymanager_language", label = NULL, 
-                choices = lan, selected = lan, multiple = FALSE)
+    selectInput(
+      inputId = "shinymanager_language", label = NULL,
+      choices = lan, selected = lan, multiple = FALSE
+    )
   )
 }
 
@@ -47,7 +50,7 @@ clearQueryString <- function(session = getDefaultReactiveDomain()) {
 #' @importFrom shiny getQueryString getDefaultReactiveDomain
 getToken <- function(session = getDefaultReactiveDomain()) {
   query <- getQueryString(session = session)
-  if(!is.null(query$token)){
+  if (!is.null(query$token)) {
     gsub('\"', "", query$token)
   } else {
     NULL
@@ -58,7 +61,7 @@ getToken <- function(session = getDefaultReactiveDomain()) {
 #' @importFrom shiny getQueryString getDefaultReactiveDomain
 getLanguage <- function(session = getDefaultReactiveDomain()) {
   query <- getQueryString(session = session)
-  if(!is.null(query$language)){
+  if (!is.null(query$language)) {
     gsub('\"', "", query$language)
   } else {
     NULL
@@ -74,7 +77,7 @@ resetQueryString <- function(session = getDefaultReactiveDomain()) {
   if (length(query) == 0) {
     clearQueryString(session = session)
   } else {
-    query <- paste(names(query), query, sep = "=", collapse="&")
+    query <- paste(names(query), query, sep = "=", collapse = "&")
     query <- gsub("_inputs_=", "_inputs_", query, fixed = T) # shiny bookmark
     updateQueryString(queryString = paste0("?", query), mode = "replace", session = session)
   }
@@ -82,11 +85,11 @@ resetQueryString <- function(session = getDefaultReactiveDomain()) {
 
 #  Add token to query string but leave rest of query (if any) in tact
 #' @importFrom shiny updateQueryString getQueryString getDefaultReactiveDomain
-addAuthToQuery <- function(session = getDefaultReactiveDomain(), token, language ) {
+addAuthToQuery <- function(session = getDefaultReactiveDomain(), token, language) {
   query <- getQueryString(session = session)
   query$token <- paste0('"', token, '"') # shiny bookmark
   query$language <- paste0('"', language, '"') # shiny bookmark
-  query <- paste(names(query), query, sep = "=", collapse="&")
+  query <- paste(names(query), query, sep = "=", collapse = "&")
   query <- gsub("_inputs_=", "_inputs_", query, fixed = T) # shiny bookmark
   updateQueryString(queryString = paste0("?", query), mode = "replace", session = session)
 }
@@ -94,11 +97,10 @@ addAuthToQuery <- function(session = getDefaultReactiveDomain(), token, language
 #' @importFrom htmltools tags doRenderTags
 #' @importFrom shiny icon
 input_btns <- function(inputId, users, tooltip, icon, status = "primary", lan = NULL) {
-
-  if(is.null(lan)){
+  if (is.null(lan)) {
     lan <- use_language()
   }
-  
+
   tag <- lapply(
     X = users,
     FUN = function(x) {
@@ -122,7 +124,7 @@ input_btns <- function(inputId, users, tooltip, icon, status = "primary", lan = 
 }
 
 
-remove_input <- function(id, session){
+remove_input <- function(id, session) {
   shiny::removeUI(paste0("#", id), immediate = TRUE)
   session$sendCustomMessage(
     type = "rmInputSM",
@@ -132,10 +134,12 @@ remove_input <- function(id, session){
 
 input_checkbox_ui <- function(id, users, session, checked = FALSE) {
   ns <- NS(id)
-  inputs <- isolate({names(session$input)})
+  inputs <- isolate({
+    names(session$input)
+  })
   rm_inputs <- inputs[grepl(paste0("^", gsub("^(admin-)", "", ns("check_"))), inputs)]
-  if(length(rm_inputs) > 0){
-    for(i in rm_inputs){
+  if (length(rm_inputs) > 0) {
+    for (i in rm_inputs) {
       remove_input(paste0("admin-", i), session)
     }
   }
@@ -144,7 +148,7 @@ input_checkbox_ui <- function(id, users, session, checked = FALSE) {
     FUN = function(x) {
       # res <- checkboxInput(inputId = ns(paste0("check_", x)), label = NULL, value = FALSE)
       res <- tags$input(id = ns(paste0("check_", x)), type = "checkbox", style = "float: right;")
-      if(checked) res$attribs$checked <- "checked"
+      if (checked) res$attribs$checked <- "checked"
       doRenderTags(res)
     }
   )
@@ -152,13 +156,12 @@ input_checkbox_ui <- function(id, users, session, checked = FALSE) {
 }
 
 input_checkbox <- function(input, output, session) {
-  
   reac <- reactive({
     inputs <- reactiveValuesToList(input)
     inputs <- dropFalse(inputs)
     gsub(pattern = "^check_", replacement = "", x = names(inputs))
   })
-  
+
   return(reac)
 }
 
@@ -169,16 +172,18 @@ unbindDT <- function(id, session = getDefaultReactiveDomain()) {
   )
 }
 
-fileReaderSqlite <- function(sqlite_path, passphrase, name){
-    conn <- dbConnect(SQLite(), dbname = sqlite_path)
-    on.exit(dbDisconnect(conn))
-    res <- tryCatch(read_db_decrypt(conn = conn, name = name, passphrase = passphrase), 
-             error = function(e) NULL)
+fileReaderSqlite <- function(sqlite_path, passphrase, name) {
+  conn <- dbConnect(SQLite(), dbname = sqlite_path)
+  on.exit(dbDisconnect(conn))
+  res <- tryCatch(read_db_decrypt(conn = conn, name = name, passphrase = passphrase),
+    error = function(e) NULL
+  )
 }
 
-fileReaderSQL <- function(config_db, name){
-    conn <- connect_sql_db(config_db)
-    on.exit(disconnect_sql_db(conn, config_db))
-    res <- tryCatch(db_read_table_sql(conn, config_db$tables[[name]]$tablename), 
-                    error = function(e) NULL)
+fileReaderSQL <- function(config_db, name) {
+  conn <- connect_sql_db(config_db)
+  on.exit(disconnect_sql_db(conn, config_db))
+  res <- tryCatch(db_read_table_sql(conn, config_db$tables[[name]]$tablename),
+    error = function(e) NULL
+  )
 }

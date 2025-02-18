@@ -1,5 +1,3 @@
-
-
 #' @importFrom R6 R6Class
 #' @importFrom openssl sha256 rand_bytes
 .tokens <- R6::R6Class(
@@ -13,7 +11,7 @@
     },
     add = function(token, ...) {
       args <- list(...)
-      if(length(args) > 0){
+      if (length(args) > 0) {
         args[[1]]$shinymanager_datetime <- Sys.time()
       } else {
         args <- list(list(shinymanager_datetime = Sys.time()))
@@ -32,12 +30,12 @@
     },
     is_valid_timeout = function(token, update = TRUE) {
       datetime <- private$tokens_user[[token]]$shinymanager_datetime
-      if(!is.null(datetime) && private$timeout  > 0){
+      if (!is.null(datetime) && private$timeout > 0) {
         valid <- difftime(Sys.time(), datetime, units = "mins") <= private$timeout
       } else {
         valid <- TRUE
       }
-      if(valid && update) private$tokens_user[[token]]$shinymanager_datetime <- Sys.time()
+      if (valid && update) private$tokens_user[[token]]$shinymanager_datetime <- Sys.time()
       valid
     },
     get_user = function(token) {
@@ -53,15 +51,17 @@
       isTRUE(token %in% private$tokens)
     },
     is_admin = function(token) {
-      isTRUE(as.logical(private$tokens_user[[token]]$admin))
+      isTRUE(as.logical(private$tokens_user[[token]]$is_admin))
     },
     get = function(token) {
       info <- private$tokens_user[[token]]
-      if("shinymanager_datetime" %in% names(info)) info$shinymanager_datetime <- NULL
+      if ("shinymanager_datetime" %in% names(info)) info$shinymanager_datetime <- NULL
       info
     },
     remove = function(token) {
-      if (private$length() == 0) return(NULL)
+      if (private$length() == 0) {
+        return(NULL)
+      }
       private$tokens <- setdiff(private$tokens, token)
       invisible()
     },
@@ -80,7 +80,7 @@
       invisible(private$sql_config_db)
     },
     get_sql_config_db = function() {
-      private$sql_config_db 
+      private$sql_config_db
     },
     set_passphrase = function(passphrase) {
       private$passphrase <- passphrase
@@ -109,4 +109,3 @@
   )
 )
 .tok <- .tokens$new()
-

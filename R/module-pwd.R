@@ -1,4 +1,3 @@
-
 #' New password module
 #'
 #' @param id Module's id.
@@ -16,16 +15,15 @@
 #'
 #' @example examples/module-pwd.R
 pwd_ui <- function(id, tag_img = NULL, status = "primary", lan = NULL) {
-  
   ns <- NS(id)
-  
-  if(is.null(lan)){
+
+  if (is.null(lan)) {
     lan <- use_language()
   }
-  
+
   tagList(
     singleton(tags$head(
-      tags$link(href="shinymanager/styles-auth.css", rel="stylesheet"),
+      tags$link(href = "shinymanager/styles-auth.css", rel = "stylesheet"),
       tags$script(src = "shinymanager/bindEnter.js")
     )),
     tags$div(
@@ -95,7 +93,7 @@ pwd_ui <- function(id, tag_img = NULL, status = "primary", lan = NULL) {
 #'  one uppercase and be of length 6 at least.
 #' @param use_token Add a token in the URL to check authentication. Should not be used directly.
 #' @param lan An language object. Should not be used directly.
-#' 
+#'
 #' @export
 #'
 #' @rdname module-password
@@ -103,119 +101,119 @@ pwd_ui <- function(id, tag_img = NULL, status = "primary", lan = NULL) {
 #' @importFrom htmltools tags
 #' @importFrom shiny reactiveValues observeEvent removeUI insertUI icon actionButton
 #' @importFrom utils getFromNamespace
-pwd_server <- function(input, output, session, user, update_pwd, validate_pwd = NULL, 
+pwd_server <- function(input, output, session, user, update_pwd, validate_pwd = NULL,
                        use_token = FALSE, lan = NULL) {
-  
-  if(!is.reactive(lan)){
-    if(is.null(lan)){
+  if (!is.reactive(lan)) {
+    if (is.null(lan)) {
       lan <- reactive(use_language())
     } else {
       lan <- reactive(lan)
     }
   }
-  
+
   if (is.null(validate_pwd)) {
     validate_pwd <- getFromNamespace("validate_pwd", "shinymanager")
   }
-  
+
   ns <- session$ns
   jns <- function(x) {
     paste0("#", ns(x))
   }
-  
+
   password <- reactiveValues(result = FALSE, user = NULL, relog = NULL)
-  
-  observeEvent(input$update_pwd, {
-    password$relog <- NULL
-    removeUI(selector = jns("msg_pwd"))
-    
-    insertUI(
-      selector = jns("container-btn-update"),
-      ui = tags$div(
-        id = ns("spinner_msg_pwd"),
-        img(src = "shinymanager/1497.gif", style = "height:30px;"), 
-        align = "center"
-      ),
-      immediate = TRUE 
-    )
-    
-    if (!identical(input$pwd_one, input$pwd_two)) {
-      removeUI(selector = jns("spinner_msg_pwd"))
+
+  observeEvent(input$update_pwd,
+    {
+      password$relog <- NULL
+      removeUI(selector = jns("msg_pwd"))
+
       insertUI(
-        selector = jns("result_pwd"),
+        selector = jns("container-btn-update"),
         ui = tags$div(
-          id = ns("msg_pwd"), class = "alert alert-danger",
-          icon("triangle-exclamation"), lan()$get("The two passwords are different")
-        )
+          id = ns("spinner_msg_pwd"),
+          img(src = "shinymanager/1497.gif", style = "height:30px;"),
+          align = "center"
+        ),
+        immediate = TRUE
       )
-    } else if (!check_new_pwd(user$user, input$pwd_one)) {
-      removeUI(selector = jns("spinner_msg_pwd"))
-      insertUI(
-        selector = jns("result_pwd"),
-        ui = tags$div(
-          id = ns("msg_pwd"), class = "alert alert-danger",
-          icon("triangle-exclamation"), lan()$get("New password cannot be the same as old")
-        )
-      )
-    } else {
-      if (!isTRUE(validate_pwd(input$pwd_one))) {
+
+      if (!identical(input$pwd_one, input$pwd_two)) {
         removeUI(selector = jns("spinner_msg_pwd"))
         insertUI(
           selector = jns("result_pwd"),
           ui = tags$div(
             id = ns("msg_pwd"), class = "alert alert-danger",
-            icon("triangle-exclamation"), lan()$get("Password does not respect safety requirements")
+            icon("triangle-exclamation"), lan()$get("The two passwords are different")
+          )
+        )
+      } else if (!check_new_pwd(user$user, input$pwd_one)) {
+        removeUI(selector = jns("spinner_msg_pwd"))
+        insertUI(
+          selector = jns("result_pwd"),
+          ui = tags$div(
+            id = ns("msg_pwd"), class = "alert alert-danger",
+            icon("triangle-exclamation"), lan()$get("New password cannot be the same as old")
           )
         )
       } else {
-        
-        res_pwd <- update_pwd(user$user, input$pwd_one)
-        
-        if (isTRUE(res_pwd$result)) {
-          password$result <- TRUE
-          password$user <- user$user
-          removeUI(selector = jns("container-btn-update"))
-          insertUI(
-            selector = jns("result_pwd"),
-            ui = tags$div(
-              id = ns("msg_pwd"),
-              tags$div(
-                class = "alert alert-success",
-                icon("check"), lan()$get("Password successfully updated! Please re-login")
-              ),
-              actionButton(
-                inputId = ns("relog"),
-                label = lan()$get("Login"),
-                width = "100%"
-              )
-            )
-          )
-        } else {
+        if (!isTRUE(validate_pwd(input$pwd_one))) {
+          removeUI(selector = jns("spinner_msg_pwd"))
           insertUI(
             selector = jns("result_pwd"),
             ui = tags$div(
               id = ns("msg_pwd"), class = "alert alert-danger",
-              icon("triangle-exclamation"), lan()$get("Failed to update password")
+              icon("triangle-exclamation"), lan()$get("Password does not respect safety requirements")
             )
           )
+        } else {
+          res_pwd <- update_pwd(user$user, input$pwd_one)
+
+          if (isTRUE(res_pwd$result)) {
+            password$result <- TRUE
+            password$user <- user$user
+            removeUI(selector = jns("container-btn-update"))
+            insertUI(
+              selector = jns("result_pwd"),
+              ui = tags$div(
+                id = ns("msg_pwd"),
+                tags$div(
+                  class = "alert alert-success",
+                  icon("check"), lan()$get("Password successfully updated! Please re-login")
+                ),
+                actionButton(
+                  inputId = ns("relog"),
+                  label = lan()$get("Login"),
+                  width = "100%"
+                )
+              )
+            )
+          } else {
+            insertUI(
+              selector = jns("result_pwd"),
+              ui = tags$div(
+                id = ns("msg_pwd"), class = "alert alert-danger",
+                icon("triangle-exclamation"), lan()$get("Failed to update password")
+              )
+            )
+          }
         }
       }
-    }
-  }, ignoreInit = TRUE)
-  
-  observeEvent(input$relog, {
-    if (isTRUE(use_token)) {
-      token <- getToken(session = session)
-      .tok$remove(token)
-      resetQueryString(session = session)
-      session$reload()
-    }
-    password$relog <- input$relog
-  }, ignoreInit = TRUE)
-  
+    },
+    ignoreInit = TRUE
+  )
+
+  observeEvent(input$relog,
+    {
+      if (isTRUE(use_token)) {
+        token <- getToken(session = session)
+        .tok$remove(token)
+        resetQueryString(session = session)
+        session$reload()
+      }
+      password$relog <- input$relog
+    },
+    ignoreInit = TRUE
+  )
+
   return(password)
 }
-
-
-
-

@@ -12,7 +12,7 @@ secure_app(
   enable_admin = FALSE,
   head_auth = NULL,
   theme = NULL,
-  language = "en",
+  language = "fr",
   fab_position = "bottom-right"
 )
 

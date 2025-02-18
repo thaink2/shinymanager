@@ -13,8 +13,8 @@
 #'   \item \strong{password (mandatory)} : the user's password.
 #'   \item \strong{admin (optional)} : logical, is user have admin right ? If so,
 #'    user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing.
-#'   \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
-#'   \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
+#'   \item \strong{start_time (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
+#'   \item \strong{expire_time (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
 #'   \item \strong{applications (optional)} : the name of the applications to which the user is authorized,
 #'    separated by a semicolon. The name of the application corresponds to the name of the directory,
 #'    or can be declared using : \code{options("shinymanager.application" = "my-app")}
@@ -60,69 +60,72 @@
 #' ui <- secure_app(ui, choose_language = TRUE)
 #'
 #'
-#'server <- function(input, output, session) {
+#' server <- function(input, output, session) {
+#'   # call the server part
+#'   # check_credentials returns a function to authenticate users
+#'   res_auth <- secure_server(
+#'     check_credentials = check_credentials(db = "path/to/your_sql_configuration.yml")
+#'   )
 #'
-#'  # call the server part
-#'  # check_credentials returns a function to authenticate users
-#'  res_auth <- secure_server(
-#'    check_credentials = check_credentials(db = "path/to/your_sql_configuration.yml")
-#'  )
+#'   output$auth_output <- renderPrint({
+#'     reactiveValuesToList(res_auth)
+#'   })
 #'
-#'  output$auth_output <- renderPrint({
-#'    reactiveValuesToList(res_auth)
-#'  })
+#'   observe({
+#'     print(input$shinymanager_where)
+#'     print(input$shinymanager_language)
+#'   })
 #'
-#'  observe({
-#'    print(input$shinymanager_where)
-#'    print(input$shinymanager_language)
-#'  })
+#'   # your classic server logic
+#' }
 #'
-#'  # your classic server logic
-#'
-#'}
-#'
-#'shinyApp(ui, server)
-#'
-#'}
+#' shinyApp(ui, server)
+#' }
 #'
 #' @seealso \code{\link{create_db}}, \code{\link{create_sql_db}}, \code{\link{check_credentials}}
 create_sql_db <- function(credentials_data, config_path) {
-  if (!all(c("user", "password") %in% names(credentials_data))) {
-    stop("credentials_data must contains columns: 'user', 'password'", call. = FALSE)
+  cred_data <<- credentials_data
+  if (!all(c("username", "password") %in% names(credentials_data))) {
+    stop("credentials_data must contains columns: 'username', 'password'", call. = FALSE)
   }
-  if(any(duplicated(credentials_data$user))){
+  if (any(duplicated(credentials_data$username))) {
     stop("Duplicated users in credentials_data", call. = FALSE)
   }
-  if(!"admin" %in% names(credentials_data)){
-    credentials_data$admin <- FALSE
+  if (!"is_admin" %in% names(credentials_data)) {
+    credentials_data$is_admin <- FALSE
   }
-  if(!"start" %in% names(credentials_data)){
-    credentials_data$start <- as.Date(NA)
+  if (!"start_time" %in% names(credentials_data)) {
+    credentials_data$start_time <- as.Date(NA)
   }
-  if(!"expire" %in% names(credentials_data)){
-    credentials_data$expire <- as.Date(NA)
+  if (!"expire_time" %in% names(credentials_data)) {
+    credentials_data$expire_time <- as.Date(NA)
   }
 
-  default_col <- c("user", "password", "start", "expire", "admin")
-  credentials_data <- credentials_data[, c(default_col,
-                                           setdiff(colnames(credentials_data), default_col))]
+  default_col <- c("username", "password", "start_time", "expire_time", "is_admin")
+  credentials_data <- credentials_data[, c(
+    default_col,
+    setdiff(colnames(credentials_data), default_col)
+  )]
 
-  config_db <- tryCatch({
-    yaml::yaml.load_file(config_path, eval.expr = TRUE)
-  }, error = function(e) stop("Error reading 'config_path' SQL DB configuration :", e$message))
+  config_db <- tryCatch(
+    {
+      yaml::yaml.load_file(config_path, eval.expr = TRUE)
+    },
+    error = function(e) stop("Error reading 'config_path' SQL DB configuration :", e$message)
+  )
 
   verify_sql_config(config_db)
 
   ## init table
-  conn <- connect_sql_db(config_db)
-  on.exit(disconnect_sql_db(conn, config_db))
+  conn <- th2product::connect_to_database()
+  on.exit(DBI::dbDisconnect(conn))
 
-  init_user <- !config_db$tables$pwd_mngt$tablename %in% dbListTables(conn)
+  init_user <- !config_db$tables$pwd_mngt$tablename %in% DBI::dbListTables(conn)
 
-  for(t in config_db$tables){
+  for (t in config_db$tables) {
     tablename <- t$tablename
-    if(tablename %in% dbListTables(conn)){
-      warning(tablename, " already exists in database. Please remove it if wanted / needed")
+    if (tablename %in% dbListTables(conn)) {
+      # warning(tablename, " already exists in database. Please remove it if wanted / needed")
     } else {
       tablename <- SQL(tablename)
       request <- glue_sql(t$init, .con = conn)
@@ -130,19 +133,19 @@ create_sql_db <- function(credentials_data, config_path) {
     }
   }
 
-  if(init_user){
+  if (init_user) {
     # init credentials data
-    write_sql_db(
+    write_sql_pg_db(
       config_db = config_db,
       value = credentials_data,
       name = config_db$tables$credentials$tablename
     )
 
 
-    write_sql_db(
+    write_sql_pg_db(
       config_db = config_db,
       value = data.frame(
-        user = credentials_data$user,
+        username = credentials_data$user,
         must_change = FALSE,
         have_changed = FALSE,
         date_change = Sys.Date(),
@@ -162,30 +165,30 @@ write_sql_db <- function(config_db, value, name = "credentials") {
   on.exit(disconnect_sql_db(conn, config_db))
   name <- SQL(name)
 
-  if("password" %in% colnames(value)){
+  if ("password" %in% colnames(value)) {
     # store hashed password
     value$password <- sapply(value$password, function(x) scrypt::hashPassword(x))
   }
 
-  if("MariaDBConnection" %in% class(conn)){
+  if ("MariaDBConnection" %in% class(conn)) {
     is_logical <- sapply(value, function(x) "logical" %in% class(x) || all(x %in% c("TRUE", "FALSE")))
-    if(any(is_logical)){
-      for(i in which(is_logical)){
+    if (any(is_logical)) {
+      for (i in which(is_logical)) {
         value[[i]] <- as.integer(as.logical(value[[i]]))
       }
     }
   }
 
-  if(!"spark_connection" %in% class(conn)){
+  if (!"spark_connection" %in% class(conn)) {
     dbAppendTable(conn = conn, name = name, value = value)
   } else {
-    col_date <- c("start", "expire", "date_change")
-    for(i in col_date){
-      if(i %in% colnames(value)){
+    col_date <- c("start_time", "expire_time", "date_change")
+    for (i in col_date) {
+      if (i %in% colnames(value)) {
         value[[i]] <- as.Date(value[[i]])
       }
     }
-    if (!requireNamespace("sparklyr", quietly = TRUE)){
+    if (!requireNamespace("sparklyr", quietly = TRUE)) {
       stop("Needed sparklyr package")
     }
 
@@ -196,20 +199,38 @@ write_sql_db <- function(config_db, value, name = "credentials") {
   }
 }
 
-db_read_table_sql <- function(conn, tablename){
-  if(!"spark_connection" %in% class(conn)){
+write_sql_pg_db <- function(config_db, value, name = "credentials") {
+  conn <- connect_sql_db(config_db)
+  on.exit(disconnect_sql_db(conn, config_db))
+  name <- DBI::SQL(name)
+  if ("password" %in% colnames(value)) {
+    value$password <- sapply(value$password, scrypt::hashPassword)
+  }
+  is_logical <- sapply(value, is.logical)
+  if (any(is_logical)) {
+    for (i in which(is_logical)) {
+      value[[i]] <- as.integer(as.logical(value[[i]]))
+    }
+  }
+  DBI::dbAppendTable(conn = conn, name = name, value = value)
+  invisible(TRUE)
+}
+
+
+db_read_table_sql <- function(conn, tablename) {
+  if (!"spark_connection" %in% class(conn)) {
     res <- dbReadTable(conn, tablename)
   } else {
     tablename <- SQL(tablename)
     request <- glue_sql("SELECT *  FROM {tablename}", .con = conn)
     res <- dbGetQuery(conn, request)
   }
-  if("tbl" %in% class(res)) res <- as.data.frame(res)
+  if ("tbl" %in% class(res)) res <- as.data.frame(res)
   res
 }
 
-db_list_fields_sql <-function(conn, tablename){
-  if(!"spark_connection" %in% class(conn)){
+db_list_fields_sql <- function(conn, tablename) {
+  if (!"spark_connection" %in% class(conn)) {
     dbListFields(conn, tablename)
   } else {
     tablename <- SQL(tablename)
@@ -219,8 +240,7 @@ db_list_fields_sql <-function(conn, tablename){
 }
 
 
-verify_sql_config <- function(config_db){
-
+verify_sql_config <- function(config_db) {
   # all needed info
   stopifnot(all(c("r_packages", "connect", "tables") %in% names(config_db)))
 
@@ -233,14 +253,14 @@ verify_sql_config <- function(config_db){
   stopifnot(all(c("tablename", "init", "select", "update", "delete") %in% names(config_db$tables$pwd_mngt)))
 
   # require packages
-  for(pck in config_db$r_packages){
+  for (pck in config_db$r_packages) {
     check <- suppressPackageStartupMessages({
       suppressWarnings({
         requireNamespace(pck, quietly = T)
       })
     })
 
-    if(!check){
+    if (!check) {
       stop("Can't load ", pck, " package")
     }
   }
@@ -254,7 +274,7 @@ verify_sql_config <- function(config_db){
 }
 
 get_fun <- function(x) {
-  if(length(grep("::", x)) > 0) {
+  if (length(grep("::", x)) > 0) {
     parts <- strsplit(x, "::")[[1]]
     getExportedValue(parts[1], parts[2])
   } else {
@@ -262,12 +282,8 @@ get_fun <- function(x) {
   }
 }
 
-connect_sql_db <- function(config_db, force_connect = FALSE){
-  if(((length(config_db$connect_every_request) == 0) | (length(config_db$connect_every_request) > 0 &&  !config_db$connect_every_request && exists("con", envir = shinymanager_con))) && !force_connect){
-    return(get("con", envir = shinymanager_con))
-  }
-
-  if("fun" %in% names(config_db$connect)){
+connect_sql_db <- function(config_db, force_connect = FALSE) {
+  if ("fun" %in% names(config_db$connect)) {
     fun <- config_db$connect$fun
     params <- config_db$connect
     params$fun <- NULL
@@ -275,26 +291,28 @@ connect_sql_db <- function(config_db, force_connect = FALSE){
     fun <- "dbConnect"
     params <- config_db$connect
   }
-  con <- tryCatch({
-    do.call(get_fun(fun), params)
-  }, error = function(e) stop("Can't connect to database : ", e$message, ". Verify configuration file"))
-
-  if((length(config_db$connect_every_request) == 0) | (length(config_db$connect_every_request) > 0 && !config_db$connect_every_request)){
-    assign("con", con, envir = shinymanager_con)
-  }
+  con <- tryCatch(
+    {
+      do.call(get_fun(fun), params)
+    },
+    error = function(e) stop("Can't connect to database : ", e$message, ". Verify configuration file")
+  )
 
   con
 }
 
-disconnect_sql_db <- function(con, config_db = NULL){
-  if(length(config_db$connect_every_request) > 0 && config_db$connect_every_request){
-    if("fun" %in% names(config_db$disconnect)){
+disconnect_sql_db <- function(con, config_db = NULL) {
+  if (length(config_db$connect_every_request) > 0 && config_db$connect_every_request) {
+    if ("fun" %in% names(config_db$disconnect)) {
       fun <- config_db$disconnect$fun
     } else {
       fun <- "dbDisconnect"
     }
-    tryCatch({
-      do.call(get_fun(fun), list(con))
-    }, error = function(e) stop("Can't disconnect to database : ", e$message, ". Verify configuration file"))
+    tryCatch(
+      {
+        do.call(get_fun(fun), list(con))
+      },
+      error = function(e) stop("Can't disconnect to database : ", e$message, ". Verify configuration file")
+    )
   }
 }

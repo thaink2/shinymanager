@@ -2,16 +2,16 @@ context("test-tokens")
 
 .tok <- .tokens$new()
 
-token_admin = "token_admin"
+token_admin <- "token_admin"
 list_info_admin <- list(user = "benoit", role = "full", admin = TRUE)
 
-token_not_admin = "token_not_admin"
+token_not_admin <- "token_not_admin"
 list_info_not_admin <- list(user = "victor", role = "full", admin = FALSE)
 
 test_that("create token", {
   expect_silent(.tok$add(token_admin, list_info_admin))
   expect_equal(.tok$get(token_admin), list_info_admin)
-  
+
   expect_silent(.tok$add(token_not_admin, list_info_not_admin))
   expect_equal(.tok$get(token_not_admin), list_info_not_admin)
 })
@@ -21,10 +21,10 @@ test_that("valid token", {
   expect_true(.tok$is_valid(token_admin))
   expect_true(.tok$is_valid(token_not_admin))
   expect_false(.tok$is_valid("bad_token"))
-  
+
   expect_false(.tok$is_valid(token_admin))
   expect_false(.tok$is_valid(token_not_admin))
-  
+
   expect_true(.tok$is_valid_server(token_admin))
   expect_true(.tok$is_valid_server(token_not_admin))
   expect_false(.tok$is_valid_server("bad_token"))
@@ -57,7 +57,7 @@ test_that("token sqlite", {
 test_that("token timeout", {
   expect_silent(.tok$set_timeout(10))
   expect_equal(.tok$get_timeout(), 10)
-  
+
   expect_silent(.tok$set_timeout(0))
   expect_equal(.tok$get_timeout(), 0)
 })

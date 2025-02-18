@@ -1,5 +1,5 @@
 ^\.travis\.yml$
-^shinymanager\.Rproj$
+^th2shinymanager\.Rproj$
 ^\.Rproj\.user$
 ^todo\.md$
 ^dev$

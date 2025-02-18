@@ -1,4 +1,3 @@
-
 #' Secure a Shiny application and manage authentication
 #'
 #' @param ui UI of the application.
@@ -31,9 +30,8 @@ secure_app <- function(ui,
                        enable_admin = FALSE,
                        head_auth = NULL,
                        theme = NULL,
-                       language = "en",
+                       language = "fr",
                        fab_position = "bottom-right") {
-
   if (!language %in% c("en", "fr", "pt-BR", "es", "de", "pl", "ja", "el", "id", "zh-CN")) {
     warning("Only supported language for the now are: en, fr, pt-BR, es, de, pl, ja, el, id, zh-CN", call. = FALSE)
     language <- "en"
@@ -49,8 +47,8 @@ secure_app <- function(ui,
   }
 
   function(request) {
-
     query <- parseQueryString(request$QUERY_STRING)
+    print(query)
 
     token <- gsub('\"', "", query$token)
 
@@ -79,7 +77,7 @@ secure_app <- function(ui,
       }
 
       if (isTRUE(enable_admin) && .tok$is_admin(token) & identical(admin, "true") &&
-          (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
+        (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
         app_ui <- navbarPage(
           title = "Admin",
           id = "sm_admin_nv",
@@ -107,7 +105,7 @@ secure_app <- function(ui,
             admin_ui("admin", lan),
             shinymanager_language(lan$get_language())
           ),
-          if(show_logs_enabled()){
+          if (show_logs_enabled()) {
             tabPanel(
               title = lan$get("Logs"),
               logs_ui("logs", lan),
@@ -118,7 +116,7 @@ secure_app <- function(ui,
         return(app_ui)
       } else {
         if (isTRUE(enable_admin) && .tok$is_admin(token) &&
-            (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
+          (!is.null(.tok$get_sqlite_path()) | !is.null(.tok$get_sql_config_db()))) {
           menu <- fab_button(
             position = fab_position,
             actionButton(
@@ -134,7 +132,7 @@ secure_app <- function(ui,
           )
         } else {
           if (isTRUE(enable_admin) && .tok$is_admin(token) &&
-              is.null(.tok$get_sqlite_path()) && is.null(.tok$get_sql_config_db())) {
+            is.null(.tok$get_sqlite_path()) && is.null(.tok$get_sql_config_db())) {
             warning("Admin mode is only available when using a SQLite / SQL database!", call. = FALSE)
           }
           menu <- fab_button(
@@ -258,13 +256,14 @@ secure_server <- function(check_credentials,
                           keep_token = FALSE,
                           validate_pwd = NULL,
                           session = shiny::getDefaultReactiveDomain()) {
-
-  session$setBookmarkExclude(c(session$getBookmarkExclude(),
-                               "shinymanager_language",
-                               ".shinymanager_timeout",
-                               ".shinymanager_admin",
-                               ".shinymanager_logout",
-                               "shinymanager_where"))
+  session$setBookmarkExclude(c(
+    session$getBookmarkExclude(),
+    "shinymanager_language",
+    ".shinymanager_timeout",
+    ".shinymanager_admin",
+    ".shinymanager_logout",
+    "shinymanager_where"
+  ))
 
   token_start <- isolate(getToken(session = session))
   if (isTRUE(keep_token)) {
@@ -317,7 +316,7 @@ secure_server <- function(check_credentials,
       lan = lan
     )
 
-    if(show_logs_enabled()){
+    if (show_logs_enabled()) {
       callModule(
         module = logs,
         id = "logs",
@@ -352,32 +351,40 @@ secure_server <- function(check_credentials,
     }
   })
 
-  observeEvent(session$input$.shinymanager_admin, {
-    token <- getToken(session = session)
-    updateQueryString(queryString = sprintf("?token=\"%s\"&admin=true&language=\"%s\"", token, lan()$get_language()), session = session, mode = "replace")
-    .tok$reset_count(token)
-    session$reload()
-  }, ignoreInit = TRUE)
+  observeEvent(session$input$.shinymanager_admin,
+    {
+      token <- getToken(session = session)
+      updateQueryString(queryString = sprintf("?token=\"%s\"&admin=true&language=\"%s\"", token, lan()$get_language()), session = session, mode = "replace")
+      .tok$reset_count(token)
+      session$reload()
+    },
+    ignoreInit = TRUE
+  )
 
-  observeEvent(session$input$.shinymanager_app, {
-    token <- getToken(session = session)
-    updateQueryString(queryString = sprintf("?token=\"%s\"&language=\"%s\"", token, lan()$get_language()), session = session, mode = "replace")
-    .tok$reset_count(token)
-    session$reload()
-  }, ignoreInit = TRUE)
+  observeEvent(session$input$.shinymanager_app,
+    {
+      token <- getToken(session = session)
+      updateQueryString(queryString = sprintf("?token=\"%s\"&language=\"%s\"", token, lan()$get_language()), session = session, mode = "replace")
+      .tok$reset_count(token)
+      session$reload()
+    },
+    ignoreInit = TRUE
+  )
 
-  observeEvent(session$input$.shinymanager_logout, {
-    token <- getToken(session = session)
-    logout_logs(token)
-    .tok$remove(token)
-    clearQueryString(session = session)
-    session$reload()
-  }, ignoreInit = TRUE)
+  observeEvent(session$input$.shinymanager_logout,
+    {
+      token <- getToken(session = session)
+      logout_logs(token)
+      .tok$remove(token)
+      clearQueryString(session = session)
+      session$reload()
+    },
+    ignoreInit = TRUE
+  )
 
 
 
   if (timeout > 0) {
-
     observeEvent(session$input$.shinymanager_timeout, {
       token <- getToken(session = session)
       if (!is.null(token)) {
@@ -395,17 +402,14 @@ secure_server <- function(check_credentials,
       token <- getToken(session = session)
       if (!is.null(token)) {
         valid_timeout <- .tok$is_valid_timeout(token, update = FALSE)
-        if(!valid_timeout){
+        if (!valid_timeout) {
           .tok$remove(token)
           clearQueryString(session = session)
           session$reload()
         }
       }
     })
-
   }
 
   return(user_info_rv)
 }
-
-
