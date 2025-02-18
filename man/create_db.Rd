@@ -18,8 +18,8 @@ create_db(
 
 \item{passphrase}{A password to protect the data inside the database.}
 
-\item{flags}{\code{RSQLite::SQLITE_RWC:} open the database in read/write mode and create the database file if it does not already exist; 
-\code{RSQLite::SQLITE_RW:} open the database in read/write mode. Raise an error if the file does not already exist; 
+\item{flags}{\code{RSQLite::SQLITE_RWC:} open the database in read/write mode and create the database file if it does not already exist;
+\code{RSQLite::SQLITE_RW:} open the database in read/write mode. Raise an error if the file does not already exist;
 \code{RSQLite::SQLITE_RO:} open the database in read only mode. Raise an error if the file does not already exist}
 }
 \description{
@@ -31,9 +31,9 @@ The credentials \code{data.frame} can have the following columns:
   \item \strong{user (mandatory)} : the user's name.
   \item \strong{password (mandatory)} : the user's password.
   \item \strong{admin (optional)} : logical, is user have admin right ? If so,
-   user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing. 
-  \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing. 
-  \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing. 
+   user can access the admin mode (only available using a SQLite database). Initialize to FALSE if missing.
+  \item \strong{start (optional)} : the date from which the user will have access to the application. Initialize to NA if missing.
+  \item \strong{expire (optional)} : the date from which the user will no longer have access to the application. Initialize to NA if missing.
   \item \strong{applications (optional)} : the name of the applications to which the user is authorized,
    separated by a semicolon. The name of the application corresponds to the name of the directory,
    or can be declared using : \code{options("shinymanager.application" = "my-app")}
@@ -62,8 +62,8 @@ key_set("R-shinymanager-key", "obiwankenobi")
 create_db(
   credentials_data = credentials,
   sqlite_path = "/path/to/database.sqlite", # will be created
-   passphrase = key_get("R-shinymanager-key", "obiwankenobi")
-   # passphrase = "secret"  # or just a word, without keyring
+  passphrase = key_get("R-shinymanager-key", "obiwankenobi")
+  # passphrase = "secret"  # or just a word, without keyring
 )
 
 ### Use in shiny
@@ -77,31 +77,28 @@ ui <- secure_app(ui, choose_language = TRUE)
 
 
 server <- function(input, output, session) {
- 
- # call the server part
- # check_credentials returns a function to authenticate users
- res_auth <- secure_server(
-   check_credentials = check_credentials(
-       db = "/path/to/database.sqlite", 
-       passphrase = key_get("R-shinymanager-key", "obiwankenobi")
-   )
- )
- 
- output$auth_output <- renderPrint({
-   reactiveValuesToList(res_auth)
- })
- 
- observe({
-   print(input$shinymanager_where)
-   print(input$shinymanager_language)
- })
- 
- # your classic server logic
- 
+  # call the server part
+  # check_credentials returns a function to authenticate users
+  res_auth <- secure_server(
+    check_credentials = check_credentials(
+      db = "/path/to/database.sqlite",
+      passphrase = key_get("R-shinymanager-key", "obiwankenobi")
+    )
+  )
+
+  output$auth_output <- renderPrint({
+    reactiveValuesToList(res_auth)
+  })
+
+  observe({
+    print(input$shinymanager_where)
+    print(input$shinymanager_language)
+  })
+
+  # your classic server logic
 }
 
 shinyApp(ui, server)
-
 }
 
 }

@@ -76,7 +76,6 @@ check_credentials("credentials.sqlite", passphrase = "supersecret")
 
 ## With a SQL database:
 check_credentials("config_db.yml")
-
 }
 
 }

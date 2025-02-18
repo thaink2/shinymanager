@@ -55,8 +55,10 @@ current_user <- read_db_decrypt(
   passphrase = key_get("R-shinymanager-key", "obiwankenobi")
 )
 
-add_user <- data.frame(user = "new", password = "pwdToChange",
-                      start = NA, expire = NA, admin = TRUE)
+add_user <- data.frame(
+  user = "new", password = "pwdToChange",
+  start = NA, expire = NA, admin = TRUE
+)
 
 new_users <- rbind.data.frame(current_user, add_user)
 
